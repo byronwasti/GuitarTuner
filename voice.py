@@ -12,7 +12,7 @@ inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 inp.setperiodsize(160)
 l_d = []
 data_l = []
-for x in xrange(5000):
+for x in xrange(1000):
     l, data = inp.read()
     for i in np.fromstring(data, 'Int16'):
         data_l.append(i)
@@ -26,4 +26,7 @@ t = arange(0,len(l_d), 1)
 #plot(t, l_d)
 #print data_l
 plot(data_l)
+show()
+
+plot(np.fft.fft(data_l, 20000))
 show()
