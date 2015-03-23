@@ -3,30 +3,46 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pylab import *
 
+sample_rate = 44100
+
 inp = alsaaudio.PCM(alsaaudio.PCM_CAPTURE, alsaaudio.PCM_NONBLOCK)
 
 inp.setchannels(1)
-inp.setrate(8000)
+inp.setrate(sample_rate)
 inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 
 inp.setperiodsize(160)
 l_d = []
 data_l = []
-for x in xrange(1000):
+while True:
     l, data = inp.read()
-    for i in np.fromstring(data, 'Int16'):
-        data_l.append(i)
-    #if l:
-    #    l_d.append(audioop.max(data,2))
+    print audioop.max(data,2)
+    if audioop.max(data,2) > 6000:
+        for x in xrange(1000):
+            l, data = inp.read()
+            for i in np.fromstring(data, 'Int16'):
+                data_l.append(i)
+            
+            #if l:
+            #    l_d.append(audioop.max(data,2))
 
-    time.sleep(.001)
+            time.sleep(1.0/sample_rate)
+        break
 
 t = arange(0,len(l_d), 1)
 
 #plot(t, l_d)
 #print data_l
+#indices = find( (data_l[1:] >= 0) & (data_l[:-1] < 0) )
+#indices = find((data_l[1:] >= 0) & (data_l[:-1] < 0))
+indices = np.where(np.diff(np.sign(data_l)))[0]
+crossings = indices
+#crossings = [i - data_l[i] / (data_l[i+1] - data_l[i]) for i in indices]
+#print data_l
+print float(sample_rate)/np.mean(np.diff(crossings))
+raw_input()
 plot(data_l)
 show()
 
-plot(np.fft.fft(data_l, 20000))
+plot(np.fft.rfft(data_l, 1000))
 show()
