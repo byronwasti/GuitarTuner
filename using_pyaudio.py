@@ -18,7 +18,7 @@ while True:
     try:
         rawsamps = stream.read(1024)
         samps = np.fromstring(rawsamps, dtype=np.int16)
-    except: print "fail"
+    except: print "failed"
     indices = np.where(np.diff(np.sign(samps)))[0]
     freq = 1024.0/np.mean(np.diff(indices))
     print freq
