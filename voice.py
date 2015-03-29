@@ -13,21 +13,21 @@ inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 
 inp.setperiodsize(160)
 l_d = []
-data_l = []
 while True:
     l, data = inp.read()
-    print audioop.max(data,2)
-    if audioop.max(data,2) > 6000:
-        for x in xrange(1000):
+    #print audioop.max(data,2)
+    if audioop.max(data,2) > 10000:
+        #for x in xrange(1000):
             l, data = inp.read()
-            for i in np.fromstring(data, 'Int16'):
-                data_l.append(i)
+            data_l = np.fromstring(data, 'Int16')
             
-            #if l:
-            #    l_d.append(audioop.max(data,2))
+            indices = np.where(np.diff(np.sign(data_l)))[0]
+            crossings = indices
+            #print float(sample_rate)/np.mean(np.diff(crossings))
 
             time.sleep(1.0/sample_rate)
-        break
+            time.sleep(1)
+        #break
 
 t = arange(0,len(l_d), 1)
 
@@ -40,9 +40,9 @@ crossings = indices
 #crossings = [i - data_l[i] / (data_l[i+1] - data_l[i]) for i in indices]
 #print data_l
 print float(sample_rate)/np.mean(np.diff(crossings))
-raw_input()
-plot(data_l)
-show()
 
-plot(np.fft.rfft(data_l, 1000))
-show()
+#raw_input()
+#plot(data_l)
+#show()
+#plot(np.fft.rfft(data_l, 1000))
+#show()

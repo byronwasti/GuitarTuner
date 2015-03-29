@@ -16,11 +16,16 @@ DATA = []
 
 for x in xrange(10000):
     l, data = inp.read()
-    for i in np.fromstring(data, 'Int16'):
-        DATA.append(i)
-
+    DATA.append(data)
+    cross = audioop.cross(data, 2)
+    print cross, ' ',
+    if cross > 0:
+        print (44100.0/5.0)/cross
+    print 
     time.sleep(5.0/sample_rate)
 
+for i in DATA:
+    inp.write(data)
 
 print len(DATA)
 
