@@ -33,7 +33,6 @@ while True:
         except: print "failed"
 
         indices = np.where(np.diff(np.sign(samps)))[0]
-        print len(indices)
         freq = 1024.0/np.mean(np.diff(indices))
 
         FREQ[x] = freq
@@ -42,7 +41,7 @@ while True:
 
         for i in GFREQ:
             if i - THRESH < avg < i + THRESH:
-                #print GUITAR_STRINGS_K[i], avg
+                print GUITAR_STRINGS_K[i], avg
                 pass
 
         try:
