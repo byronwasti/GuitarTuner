@@ -38,6 +38,7 @@ while True:
         FREQ[x] = freq
 
         avg = sum(FREQ)/float(num_samples)
+        print avg
 
         for i in GFREQ:
             if i - THRESH < avg < i + THRESH:
