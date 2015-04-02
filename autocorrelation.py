@@ -5,9 +5,11 @@ import numpy as np
 import pyaudio
 from time import sleep
 import sys, os, fcntl
+import serial
+import struct
 
 ''' VARIABLE DEFINITIONS '''
-num_samples = 10
+num_samples = 50
 FREQ = [0]*num_samples
 MORE_SAMP = [0] * num_samples
 GUITAR_STRINGS = { 'E2':82.41, 'A2':110.00, 'D3':146.83, 'G3':196.00,'B3':246.94, 'E4':329.63 }
@@ -26,6 +28,9 @@ stream = pyaud.open(
     channels = 1,
     rate = 44100,
     input = True)
+
+s = serial.Serial('/dev/ttyACM0',9600, timeout=50)
+sleep(2)
 
 ''' PARABOLIC '''
 def parabolic(f, x):
@@ -53,30 +58,42 @@ def parabolic(f, x):
 
 ''' THE MAIN LOOP '''
 while True:
+    samps = []
     for x in xrange(num_samples):
         try:
             rawsamps = stream.read(1024)
-            samps = np.fromstring(rawsamps, dtype=np.int16)
+            sampler = np.fromstring(rawsamps, dtype=np.int16)
+            for i in sampler:
+                samps.append(i)
         except: pass #print "failed"
         
-        corr = fftconvolve(samps, samps[::-1], mode='full')
-        corr = corr[len(corr)/2:]
+    corr = fftconvolve(samps, samps[::-1], mode='full')
+    corr = corr[len(corr)/2:]
 
-        d = np.diff(corr)
-        start = find(d > 0)[0]
+    d = np.diff(corr)
+    start = find(d > 0)[0]
 
-        peak = np.argmax(corr[start:]) + start
-        px, py = parabolic(corr, peak)
-        
-        avg = 44100.0/px
+    peak = np.argmax(corr[start:]) + start
+    px, py = parabolic(corr, peak)
     
-        for i in GFREQ:
-            if i - THRESH < avg < i + THRESH:
-                print GUITAR_STRINGS_K[i], avg
-                pass
+    avg = 44100.0/px
+    if int(avg) == 82: break
+    if avg < 100:
+        print str(int(avg))
+        s.write(struct.pack('>B',avg))
+        tmp = s.readline()
+        print tmp
+    
 
-        try:
-            stdin = sys.stdin.read()
-            if "\n" in stdin or "\r" in stdin:
-                break
-        except IOError: pass
+    '''
+    for i in GFREQ:
+        if i - THRESH < avg < i + THRESH:
+            print GUITAR_STRINGS_K[i], avg
+            pass
+    '''
+
+    try:
+        stdin = sys.stdin.read()
+        if "\n" in stdin or "\r" in stdin:
+            break
+    except IOError: pass
