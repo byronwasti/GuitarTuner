@@ -25,5 +25,6 @@ def freq_from_crossings(sig, fs):
 filename = 'guitarE.flac'
 
 signal, fs, enc = flacread(filename)
-print fs
-print freq_from_crossings(signal, fs)
+print fs, enc
+#print fs
+#print freq_from_crossings(signal, fs)

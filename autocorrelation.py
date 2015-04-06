@@ -9,7 +9,7 @@ import serial
 import struct
 
 ''' VARIABLE DEFINITIONS '''
-num_samples = 50
+num_samples = 10
 FREQ = [0]*num_samples
 MORE_SAMP = [0] * num_samples
 GUITAR_STRINGS = { 'E2':82.41, 'A2':110.00, 'D3':146.83, 'G3':196.00,'B3':246.94, 'E4':329.63 }
