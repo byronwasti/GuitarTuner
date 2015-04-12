@@ -4,6 +4,7 @@ from numpy.fft import rfft, irfft
 from numpy import argmax, sqrt, mean, diff, log
 from matplotlib.mlab import find
 from scipy.signal import blackmanharris, fftconvolve
+from pylab import subplot, plot, log, copy, show
 from time import time
 import sys
  
@@ -50,9 +51,13 @@ def freq_from_autocorr(sig, fs):
     # one input reversed in time), and throw away the negative lags
     corr = fftconvolve(sig, sig[::-1], mode='full')
     corr = corr[len(corr)/2:]
+    plot(corr)
+    show()
     
     # Find the first low point
     d = diff(corr)
+    plot(d)
+    show()
     start = find(d > 0)[0]
     
     # Find the next peak after the low point (other than 0 lag).  This bit is 
@@ -71,7 +76,6 @@ def freq_from_HPS(sig, fs):
     """
     windowed = signal * blackmanharris(len(signal))
  
-    from pylab import subplot, plot, log, copy, show
  
     #harmonic product spectrum:
     c = abs(rfft(windowed))
@@ -93,7 +97,7 @@ def freq_from_HPS(sig, fs):
 try:
     sys.argv[1]
     filename = sys.argv[1]
-except: filename = "guitarE.flac"
+except: filename = "sounds/guitarE.flac"
 
  
 print 'Reading file "%s"\n' % filename
