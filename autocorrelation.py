@@ -28,9 +28,10 @@ stream = pyaud.open(
     channels = 1,
     rate = 44100,
     input = True)
-
+'''
 s = serial.Serial('/dev/ttyACM0',9600, timeout=50)
 sleep(2)
+'''
 
 ''' PARABOLIC '''
 def parabolic(f, x):
@@ -77,7 +78,9 @@ while True:
     px, py = parabolic(corr, peak)
     
     avg = 44100.0/px
-    if int(avg) == 82: break
+    print avg
+    #if int(avg) == 82: break
+    '''
     if avg < 100:
         print str(int(avg))
         s.write(struct.pack('>B',avg))
@@ -90,7 +93,6 @@ while True:
         if i - THRESH < avg < i + THRESH:
             print GUITAR_STRINGS_K[i], avg
             pass
-    '''
 
     try:
         stdin = sys.stdin.read()

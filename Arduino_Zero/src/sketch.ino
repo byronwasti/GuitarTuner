@@ -120,10 +120,12 @@ ISR(ADC_vect) {//when new ADC value ready
     }
   }
     
+  /*
   if (newData == 0 || newData == 1023){//if clipping
     clipping = 1;//currently clipping
     Serial.println("clipping");
   }
+  */
   
   time++;//increment timer at rate of 38.5kHz
   
@@ -155,7 +157,7 @@ void checkClipping(){//manage clipping indication
 
 void loop(){
   
-  checkClipping();
+  //checkClipping();
   
   
   if (checkMaxAmp>ampThreshold){
