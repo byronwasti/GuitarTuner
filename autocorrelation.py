@@ -36,7 +36,6 @@ sleep(2)
 def parabolic(f, x):
     """Quadratic interpolation for estimating the true position of an
     inter-sample maximum when nearby samples are known.
-   
     f is a vector and x is an index for that vector.
    
     Returns (vx, vy), the coordinates of the vertex of a parabola that goes
