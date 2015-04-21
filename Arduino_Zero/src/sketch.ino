@@ -14,6 +14,10 @@
 * This code is in the public domain.
 */
 
+//Setup Servo control
+#include <Servo.h>
+Servo Servos[] = { Servo s0, Servo s1, Servo 
+
 //clipping indicator variables
 boolean clipping = 0;
 
@@ -43,7 +47,7 @@ byte ampThreshold = 30;//raise if you have a very noisy signal
 
 void setup(){
   
-  Serial.begin(9600);
+  //Serial.begin(9600);
   
   pinMode(13,OUTPUT);//led indicator pin
   pinMode(12,OUTPUT);//output pin
@@ -162,12 +166,9 @@ void loop(){
   
   if (checkMaxAmp>ampThreshold){
     frequency = 38462/float(period);//calculate frequency timer rate/period
-  
-    //print results
-    Serial.print(frequency);
-    Serial.println(" hz");
   }
   
   delay(100);
-  
 }
+
+void 
