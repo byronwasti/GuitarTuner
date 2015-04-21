@@ -16,7 +16,16 @@
 
 //Setup Servo control
 #include <Servo.h>
-Servo Servos[] = { Servo s0, Servo s1, Servo 
+Servo Servos[6];
+uint8_t servo_outputs[] = {3, 5, 6, 9, 10, 11};
+uint8_t pos = 0;
+uint8_t stop = 90;
+int i, j, k;
+
+// Guitar Strings
+float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
+int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+float freq_thresh = 0.5; // How in tune it should make the string
 
 //clipping indicator variables
 boolean clipping = 0;
@@ -30,7 +39,7 @@ int slope[10];//storage for slope of events
 unsigned int totalTimer;//used to calculate period
 unsigned int period;//storage for period of wave
 byte index = 0;//current storage index
-float frequency;//storage for frequency calculations
+float *frequency;//storage for frequency calculations
 int maxSlope = 0;//used to calculate max slope as trigger point
 int newSlope;//storage for incoming slope data
 
@@ -165,10 +174,22 @@ void loop(){
   
   
   if (checkMaxAmp>ampThreshold){
-    frequency = 38462/float(period);//calculate frequency timer rate/period
+    *frequency = 38462/float(period);//calculate frequency timer rate/period
   }
   
   delay(100);
 }
 
-void 
+void turn_servo( float *frequency , int onString){
+  //Check to see if string is in tune
+  if ( tuned_strings[onString] - freq_thresh < *frequency &&
+      *frequency < tuned_strings[onString] + freq_thresh ){
+    return;
+  }
+  Servos[onString].attach(servo_outputs):
+  if ( *frequency > (tuned_strings[onString] + freq_thresh) ){
+    Servos[onString]
+  }else{
+
+  }
+}
