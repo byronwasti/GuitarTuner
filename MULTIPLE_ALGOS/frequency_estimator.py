@@ -51,13 +51,13 @@ def freq_from_autocorr(sig, fs):
     # one input reversed in time), and throw away the negative lags
     corr = fftconvolve(sig, sig[::-1], mode='full')
     corr = corr[len(corr)/2:]
-    plot(corr)
-    show()
+    #plot(corr)
+    #show()
     
     # Find the first low point
     d = diff(corr)
-    plot(d)
-    show()
+    #plot(d)
+    #show()
     start = find(d > 0)[0]
     
     # Find the next peak after the low point (other than 0 lag).  This bit is 
