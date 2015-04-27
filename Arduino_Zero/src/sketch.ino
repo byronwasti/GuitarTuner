@@ -16,15 +16,16 @@
 
 //Setup Servo control
 #include <Servo.h>
-Servo Servos[6];
+Servo servo;
 int servo_outputs[6] = {3, 5, 6, 9, 10, 3};
 int i, j, k;
 
 // Guitar Strings
 float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
-int onString = 5; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
-float freq_thresh = 0.5; // How in tune it should make the string
+int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+float freq_thresh = 1; // How in tune it should make the string
 float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
+float diff;
 
 //clipping indicator variables
 boolean clipping = 0;
@@ -40,6 +41,7 @@ unsigned int period;//storage for period of wave
 byte index = 0;//current storage index
 float frequency;//storage for frequency calculations
 float frequency_old;
+float frequency_old_old;
 int maxSlope = 0;//used to calculate max slope as trigger point
 int newSlope;//storage for incoming slope data
 
@@ -133,12 +135,12 @@ ISR(ADC_vect) {//when new ADC value ready
     }
   }
     
-  /*
+  ///*
   if (newData == 0 || newData == 1023){//if clipping
     clipping = 1;//currently clipping
-    Serial.println("clipping");
+    //Serial.println("clipping");
   }
-  */
+  //*/
   
   time++;//increment timer at rate of 38.5kHz
   
@@ -164,19 +166,21 @@ void reset(){//clean out some variables
 void checkClipping(){//manage clipping indication
   if (clipping){//if currently clipping
     clipping = 0;
+    Serial.println("clipping");
   }
 }
 
 
 void loop(){
   
-  //checkClipping();
+  checkClipping();
   
   
   if (checkMaxAmp>ampThreshold){
     frequency = 38462/float(period);//calculate frequency timer rate/period
     Serial.println(frequency);
-    if ( frequency - frequency_old < freq_diff ){
+    diff = frequency - frequency_old;
+    if ( -freq_diff < diff && diff < freq_diff ){
       //cli();
       Serial.println("TURNING SERVO");
       turn_servo();
@@ -198,14 +202,14 @@ void turn_servo(){
   }
 
   //Servos[onString].attach(servo_outputs[onString]);
-  Servos[onString].attach(3);
+  servo.attach(3);
 
   if ( frequency > (tuned_strings[onString] + freq_thresh) ){
-    Servos[onString].write(80);
+    servo.write(80);
   }else{
-    Servos[onString].write(100);
+    servo.write(100);
   }
   delay(100);
-  Servos[onString].detach();
+  servo.detach();
   return;
 }
