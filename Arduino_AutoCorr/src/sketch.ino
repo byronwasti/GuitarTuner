@@ -22,6 +22,16 @@ float frequency;//storage for frequency calculations
 int maxSlope = 0;//used to calculate max slope as trigger point
 int newSlope;//storage for incoming slope data
 
+// Large data storage
+const int len = 1024;
+byte DATA[len];
+unsigned int iterator = 0;
+int i, k;
+long sum, sum_old;
+float freq_per;
+byte pd_state;
+int thresh = 0;
+
 //variables for decided whether you have a match
 byte noMatch = 0;//counts how many non-matches you've received to reset variables if it's been too long
 byte slopeTol = 3;//slope tolerance- adjust this if you need
@@ -55,11 +65,42 @@ void setup()
 
 ISR(ADC_vect)
 {
-  PORTB &= B11101111;
-  prevDara = newData;
+  //PORTB &= B11101111;
   newData = ADCH;
-  if (;;){
+  if(iterator < len+1){
+    DATA[iterator] = newData;
+    iterator++;
   }
+}
+
+void loop(){
+  if (iterator > len){
+    Serial.println("Beginning autocorrelation");
+    for( i=0; i<len; i++){
+      sum_old = sum;
+      sum = 0;
+      for(k=0; k < len-i; k++) sum+= (DATA[k]-128)*(DATA[k+1]-128)/256;
+      
+      // Peak detection
+      if (pd_state == 2 && (sum-sum_old) <=0)
+      {
+        period = i;
+        pd_state = 3;
+        break;
+      }
+      if (pd_state == 1 && (sum > thresh) && (sum-sum_old) > 0) pd_state =2;
+      if (!i){
+        thresh = sum * 0.5;
+        pd_state = 1;
+      }
+    }
+
+    freq_per = 38462.0/period;
+    Serial.println(i);
+    Serial.println(freq_per);
+    iterator = 0;
+  }
+  //Serial.println("WHY!");
 }
 /*
 #include "C4.h"
