@@ -23,7 +23,7 @@ int delay_amount;
 
 // Guitar Strings
 float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
-int onString = 2; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
 float freq_thresh = 1; // How in tune it should make the string
 float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
 float diff;
@@ -189,6 +189,8 @@ void loop(){
       frequency_old = frequency;
       //sei();
     }
+  }else{
+    digitalWrite(7,LOW);
   }
   
   delay(100);
