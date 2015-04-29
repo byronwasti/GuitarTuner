@@ -17,15 +17,17 @@
 //Setup Servo control
 #include <Servo.h>
 Servo servo;
-int servo_outputs[6] = {3, 5, 6, 9, 10, 3};
+int servo_outputs[6] = {3, 5, 6, 9, 10, 11};
 int i, j, k;
+int delay_amount;
 
 // Guitar Strings
 float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
-int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+int onString = 2; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
 float freq_thresh = 1; // How in tune it should make the string
 float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
 float diff;
+
 
 //clipping indicator variables
 boolean clipping = 0;
@@ -60,8 +62,7 @@ void setup(){
   
   Serial.begin(9600);
   
-  pinMode(13,OUTPUT);//led indicator pin
-  pinMode(12,OUTPUT);//output pin
+  pinMode(7,OUTPUT);//output pin
   
   cli();//diable interrupts
   
@@ -175,18 +176,19 @@ void loop(){
   
   checkClipping();
   
-  
   if (checkMaxAmp>ampThreshold){
     frequency = 38462/float(period);//calculate frequency timer rate/period
-    Serial.println(frequency);
-    diff = frequency - frequency_old;
-    if ( -freq_diff < diff && diff < freq_diff ){
-      //cli();
-      Serial.println("TURNING SERVO");
-      turn_servo();
+    if (frequency < 500){
+      Serial.println(frequency);
+      diff = frequency - frequency_old;
+      if ( -freq_diff < diff && diff < freq_diff ){
+        //cli();
+        Serial.println("TURNING SERVO");
+        turn_servo();
+      }
+      frequency_old = frequency;
+      //sei();
     }
-    frequency_old = frequency;
-    //sei();
   }
   
   delay(100);
@@ -197,19 +199,25 @@ void turn_servo(){
   //Check to see if string is in tune
   if ( (tuned_strings[onString] - freq_thresh) < frequency &&
         frequency < (tuned_strings[onString] + freq_thresh) ){
-    Serial.println("CANCEL TUNE");
+    Serial.println("IN TUNE");
+    onString++; 
+    digitalWrite(7, HIGH);
     return;
   }
 
   //Servos[onString].attach(servo_outputs[onString]);
-  servo.attach(3);
+  servo.attach(servo_outputs[onString]);
 
   if ( frequency > (tuned_strings[onString] + freq_thresh) ){
     servo.write(80);
   }else{
     servo.write(100);
   }
-  delay(100);
+
+  delay_amount = abs(frequency - tuned_strings[onString])*200;
+  
+  delay(delay_amount < 500 ? delay_amount : 500);
+
   servo.detach();
   return;
 }
