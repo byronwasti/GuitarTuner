@@ -1,7 +1,7 @@
 from __future__ import division
 from audiolab import flacread
 from numpy.fft import rfft, irfft
-from numpy import argmax, sqrt, mean, diff, log
+from numpy import argmax, sqrt, mean, diff, log, convolve
 from matplotlib.mlab import find
 from scipy.signal import blackmanharris, fftconvolve
 from pylab import subplot, plot, log, copy, show
@@ -59,6 +59,7 @@ def freq_from_autocorr(sig, fs):
     #plot(d)
     #show()
     start = find(d > 0)[0]
+    #print(start)
     
     # Find the next peak after the low point (other than 0 lag).  This bit is 
     # not reliable for long signals, due to the desired peak occurring between 
@@ -68,6 +69,10 @@ def freq_from_autocorr(sig, fs):
     px, py = parabolic(corr, peak)
     
     return fs / px
+
+def my_autocorr(sig, fs):
+    corr = convolve(sig, sig, mode='full')
+    return 1.0
  
 def freq_from_HPS(sig, fs):
     """
@@ -102,7 +107,7 @@ except: filename = "sounds/guitarE.flac"
  
 print 'Reading file "%s"\n' % filename
 signal, fs, enc = flacread(filename)
- 
+'''
 print 'Calculating frequency from FFT:',
 start_time = time()
 print '%f Hz'   % freq_from_fft(signal, fs)
@@ -112,13 +117,19 @@ print 'Calculating frequency from zero crossings:',
 start_time = time()
 print '%f Hz' % freq_from_crossings(signal, fs)
 print 'Time elapsed: %.3f s\n' % (time() - start_time)
- 
+'''
 print 'Calculating frequency from autocorrelation:',
 start_time = time()
 print '%f Hz' % freq_from_autocorr(signal, fs)
 print 'Time elapsed: %.3f s\n' % (time() - start_time)
- 
+
+print 'Calculating frequency with MY autocorrelation code',
+start_time = time()
+print '%f Hz' % my_autocorr(signal,fs)
+print 'Time elapsed: %.3f s\n' % (time() - start_time)
+'''
 print 'Calculating frequency from harmonic product spectrum:'
 start_time = time()
 #freq_from_HPS(signal, fs)
 print 'Time elapsed: %.3f s\n' % (time() - start_time)
+'''
