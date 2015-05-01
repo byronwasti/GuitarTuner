@@ -26,7 +26,7 @@ int init_time;
 
 // Guitar Strings
 float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
-int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+int onString = 3; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
 //float freq_thresh = .02; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
 float freq_thresh = 2; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
 float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
