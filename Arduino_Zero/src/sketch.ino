@@ -24,9 +24,11 @@ int delay_amount = 50;
 int tuning;
 int init_time;
 
+boolean NEXT_STRING = false;
+
 // Guitar Strings
 float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
-int onString = 3; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
+int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
 //float freq_thresh = .02; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
 float freq_thresh = 2; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
 float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
@@ -183,7 +185,7 @@ void loop(){
   if (checkMaxAmp>ampThreshold){
     frequency = 38462/float(period);//calculate frequency timer rate/period
     Serial.println(frequency);
-    if (frequency < 350){
+    if (frequency < 350 && NEXT_STRING == false){
       diff = frequency - frequency_old;
       if ( -freq_diff < diff && diff < freq_diff ){
         //cli();
@@ -197,7 +199,8 @@ void loop(){
     }
   }else{
     delay(1000);
-    digitalWrite(7,LOW);
+    NEXT_STRING = false;
+    digitalWrite(7,NEXT_STRING);
   }
   
   delay(100);
@@ -211,8 +214,8 @@ void turn_servo(){
     Serial.println("IN TUNE");
     servo.detach();
     onString++; 
-    if (onString == 3) onString = 4;
-    digitalWrite(7, HIGH);
+    NEXT_STRING = true;
+    digitalWrite(7, NEXT_STRING);
     return;
   }
 
