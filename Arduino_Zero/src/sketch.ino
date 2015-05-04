@@ -24,14 +24,18 @@ int delay_amount = 50;
 int tuning;
 int init_time;
 
+int button_pin = 12;
+
 boolean NEXT_STRING = false;
 
 // Guitar Strings
-float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
+//float tuned_strings[] = {82.41, 110.00, 146.83, 196.00, 246.94, 329.63};
+float tuned_strings[] = {73.42, 98.00, 130.8, 174.6, 220.0, 293.7}; // Tuned 1 step down
+
 int onString = 0; //E2:0, A2:1, D3:2, G3:3, B3:4, E4:5
 //float freq_thresh = .02; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
-float freq_thresh = 2; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
-float freq_diff = 1.2; // How different concurrent frequencies have to be to be registered
+float freq_thresh = .01; // How in tune it should make the string //TURN THIS INTO A PERCENT OF FREQUENCY
+float freq_diff = 2; // How different concurrent frequencies have to be to be registered
 float diff;
 
 
@@ -69,6 +73,7 @@ void setup(){
   Serial.begin(9600);
   
   pinMode(7,OUTPUT);//output pin
+  pinMode(button_pin, INPUT_PULLUP);
   
   cli();//diable interrupts
   
@@ -185,7 +190,7 @@ void loop(){
   if (checkMaxAmp>ampThreshold){
     frequency = 38462/float(period);//calculate frequency timer rate/period
     Serial.println(frequency);
-    if (frequency < 350 && NEXT_STRING == false){
+    if (frequency < 350 && frequency > 40 && NEXT_STRING == false){
       diff = frequency - frequency_old;
       if ( -freq_diff < diff && diff < freq_diff ){
         //cli();
@@ -202,15 +207,23 @@ void loop(){
     NEXT_STRING = false;
     digitalWrite(7,NEXT_STRING);
   }
+
+  if ( digitalRead(button_pin) == LOW){ 
+    for( i = 0; i < 6; i++){
+      servo.attach(servo_outputs[i]);
+      servo.write(80);
+      delay(1500);
+    }
+  }
   
-  delay(100);
+  //delay(100);
 }
 
 void turn_servo(){
 
   //Check to see if string is in tune
-  if ( (tuned_strings[onString] - freq_thresh) < frequency &&
-        frequency < (tuned_strings[onString] + freq_thresh) ){
+  if ( (tuned_strings[onString] - tuned_strings[onString]*freq_thresh) < frequency &&
+        frequency < (tuned_strings[onString] + tuned_strings[onString]*freq_thresh) ){
     Serial.println("IN TUNE");
     servo.detach();
     onString++; 
@@ -222,7 +235,7 @@ void turn_servo(){
   //Servos[onString].attach(servo_outputs[onString]);
   servo.attach(servo_outputs[onString]);
 
-  if ( frequency > (tuned_strings[onString] + freq_thresh) ){
+  if ( frequency > (tuned_strings[onString] + tuned_strings[onString]*freq_thresh) ){
     servo.write(80);
   }else{
     servo.write(100);
@@ -233,7 +246,7 @@ void turn_servo(){
   delay(delay_amount < 500 ? delay_amount : 500);
 */
   if ( abs(frequency - tuned_strings[onString]) < 5){
-    delay(500);
+    delay(200);
   }else{
     delay(500);
   }
